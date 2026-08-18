@@ -221,20 +221,29 @@ Root Flag (root.txt): 6bdfeefc9c2ed60b24bcef59824da63f
 | **3** | **Reutilización de Credenciales** | 🟠 **Media** | La clave del servicio FTP fue reutilizada para la administración remota por SSH. |
 | **4** | **Linux Capabilities inseguras (`cap_setuid`)** | 🔴 **Crítica** | Permite a cualquier usuario local escalar privilegios de forma instantánea a `root`. |
 
-
+---
 10. Herramientas Utilizadas
 Herramienta	Uso
+---
 🔎 Nmap: Reconocimiento y enumeración de puertos y servicios
+---
 🎯 ffuf: Enumeración de rutas y recursos web
+---
 📡 Wireshark: Análisis de tráfico de red
+---
 📂 FTP: Acceso al servicio FTP
+---
 🔐 SSH: Acceso remoto al sistema
+---
 🐧 getcap	:Enumeración de Linux Capabilities
+---
 🐍 Python	: Explotación de cap_setuid
+---
    GTFOBins: Escalada de privilegios
+---
 
 
-11. Conclusión
+12. Conclusión
 
 La máquina Cap demuestra cómo diferentes vulnerabilidades y malas configuraciones pueden encadenarse para comprometer completamente un sistema.
 
