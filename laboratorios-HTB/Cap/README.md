@@ -42,9 +42,9 @@ Al acceder al servicio web en el puerto 80, se observó un panel de administraci
 
 Se realizó un escaneo de rutas en la aplicación mediante la herramienta ffuf para identificar patrones numéricos en las capturas guardadas en /data/:
 
-ffuf -u [http://10.129.88.34/data/FUZZ](http://10.129.88.34/data/FUZZ) -w /usr/share/seclists/Fuzzing/4-digits-0000-9999.txt -fs 208
+"ffuf -u [http://10.129.88.34/data/FUZZ](http://10.129.88.34/data/FUZZ) -w /usr/share/seclists/Fuzzing/4-digits-0000-9999.txt -fs 208"
 
-![Escaneo de rutas](images/03=ffuf.png)
+![Escaneo de rutas](images/03-ffuf.png)
 
 Hallazgo: Se identificó una vulnerabilidad de tipo IDOR (Insecure Direct Object Reference) en el parámetro de la URL /data/0, permitiendo acceder y descargar la primera captura de red (0.pcap) generada por el sistema.
 
@@ -59,5 +59,28 @@ Contraseña obtenida: Buck3tH4TF0RM3!
 Autenticación en FTP y Acceso por SSH
 Se probó la autenticación en el servicio FTP utilizando las credenciales encontradas:
 
-ftp nathan@10.129.88.34"
+"ftp nathan@10.129.88.34"
+
+![Conexión FTP](images/05-ftp.png)
+
+A continuación, validando la reutilización de credenciales, se logró el acceso mediante SSH al servidor como el usuario nathan:
+
+ssh nathan@10.129.88.34
+
+![Conexión SSH](images/06-ssh.png)
+
+3. Escalada de Privilegios (Privilege Escalation)
+Auditoría de Linux Capabilities
+Una vez obtenida una shell interactiva como nathan, se procedió a enumerar los binarios del sistema que posean permisos o facultades especiales (Capabilities):
+
+"getcap -r / 2>/dev/null"
+
+![getcap](images/07-getcap.png)
+
+Vulnerabilidad identificada:
+El binario /usr/bin/python3.8 tiene asignada la capability cap_setuid,cap_net_bind_service+eip. La facultad cap_setuid le otorga al intérprete de Python la capacidad de cambiar su UID a 0 (root) sin necesidad de recurrir a SUID o elevación vía sudo.
+
+Explotación y Obtención de Root
+Consultando las técnicas de explotación para Capabilities en GTFOBins, se ejecutó una sentencia en Python para cambiar el ID de usuario a root (UID 0) y desplegar una consola privilegiada:
+python3 -c 'import os; os.setuid(0); os.execl("/bin/sh", "sh")'
 
