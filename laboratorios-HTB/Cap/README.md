@@ -253,7 +253,7 @@ Posteriormente, debido al uso de FTP en texto plano, fue posible recuperar crede
 
 Estas credenciales fueron reutilizadas para obtener acceso mediante SSH como el usuario nathan.
 
-Finalmente, durante la enumeración local se identificó que el binario python3.8 poseía la capability cap_setuid, lo que permitió modificar el UID del proceso a 0 y obtener una shell con privilegios de roo
+Finalmente, durante la enumeración local se identificó que el binario python3.8 poseía la capability cap_setuid, lo que permitió modificar el UID del proceso a 0 y obtener una shell con privilegios de root
 
 
 
