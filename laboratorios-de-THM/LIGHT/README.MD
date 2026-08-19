@@ -38,7 +38,7 @@ La máquina indica que hay una aplicación de base de datos llamada **Light** co
 nc <IP> 1337
 ```
 
-![Conexión inicial vía netcat](screenshots/01.png)
+![Conexión inicial vía netcat](images/01.png)
 
 Al conectarnos con el usuario `smokey`, la aplicación devuelve una contraseña en texto plano.
 
