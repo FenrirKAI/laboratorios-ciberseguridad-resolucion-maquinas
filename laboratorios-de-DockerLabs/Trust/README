@@ -1,6 +1,0 @@
-# DockerLabs — Trust 🐳
-
-Writeup / walkthrough de la máquina **Trust** de la plataforma **DockerLabs**. El objetivo es obtener acceso inicial mediante fuerza bruta de credenciales SSH y escalar privilegios a `root` explotando un binario mal configurado en `sudo`.
-
----
-
